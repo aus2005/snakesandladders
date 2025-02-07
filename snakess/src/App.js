@@ -1,5 +1,4 @@
 import React from "react";
-import DiceRoll from "./diceroll";
 import Chessboard from "./board";
 
 function App() {
@@ -9,7 +8,7 @@ function App() {
         Chessboard with Dice
       </h1>
       <Chessboard />
-      <DiceRoll />
+    
     </div>
   );
 }
