@@ -1,0 +1,25 @@
+.b {
+  background-color: red;
+  display: table-cell;
+  vertical-align: middle;
+}
+.w {
+  float: left;
+  background-color: white;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+td {
+  border: black solid 1px;
+  height: 100px;
+  width: 100px;
+  font-size: 50px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+table {
+  margin-left: 400px;
+}
