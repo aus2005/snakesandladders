@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useSpring, animated } from "@react-spring/three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
@@ -25,11 +25,36 @@ function DiceFace({ dots, rotation }) {
 function Dice({ number, isRolling }) {
   const dotPositions = {
     1: [[0, 0]],
-    2: [[-0.3, -0.3], [0.3, 0.3]],
-    4: [[-0.3, -0.3], [0, 0], [0.3, 0.3]],
-    3: [[-0.3, -0.3], [-0.3, 0.3], [0.3, -0.3], [0.3, 0.3]],
-    5: [[-0.3, -0.3], [-0.3, 0], [-0.3, 0.3], [0.3, -0.3], [0.3, 0], [0.3, 0.3]],
-    6: [[-0.3, -0.3], [-0.3, 0.3], [0, 0], [0.3, -0.3], [0.3, 0.3]]
+    2: [
+      [-0.3, -0.3],
+      [0.3, 0.3],
+    ],
+    4: [
+      [-0.3, -0.3],
+      [0, 0],
+      [0.3, 0.3],
+    ],
+    3: [
+      [-0.3, -0.3],
+      [-0.3, 0.3],
+      [0.3, -0.3],
+      [0.3, 0.3],
+    ],
+    5: [
+      [-0.3, -0.3],
+      [-0.3, 0],
+      [-0.3, 0.3],
+      [0.3, -0.3],
+      [0.3, 0],
+      [0.3, 0.3],
+    ],
+    6: [
+      [-0.3, -0.3],
+      [-0.3, 0.3],
+      [0, 0],
+      [0.3, -0.3],
+      [0.3, 0.3],
+    ],
   };
 
   const finalRotations = {
@@ -64,7 +89,11 @@ function Dice({ number, isRolling }) {
         <meshBasicMaterial color="red" />
       </mesh>
       {[1, 2, 3, 4, 5, 6].map((face) => (
-        <DiceFace key={face} dots={dotPositions[face]} rotation={finalRotations[face]} />
+        <DiceFace
+          key={face}
+          dots={dotPositions[face]}
+          rotation={finalRotations[face]}
+        />
       ))}
     </animated.group>
   );
@@ -74,9 +103,17 @@ function DiceRoll({ onRoll, disabled }) {
   const [roll, setRoll] = useState(1);
   const [isRolling, setIsRolling] = useState(false);
 
+  const diceSound = new Audio("/Dice Sound.mp3");
+
+  useEffect(() => {
+    if (isRolling) {
+      diceSound.play();
+    }
+  }, [isRolling, diceSound]);
+
   const rollDice = () => {
     if (disabled || isRolling) return;
-    
+
     setIsRolling(true);
     setTimeout(() => {
       const newRoll = Math.floor(Math.random() * 6) + 1;
@@ -94,7 +131,11 @@ function DiceRoll({ onRoll, disabled }) {
         <Dice number={roll} isRolling={isRolling} />
       </Canvas>
       <button
-        className={`mt-4 px-6 py-2 rounded-lg text-lg font-semibold ${disabled || isRolling ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
+        className={`mt-4 px-6 py-2 rounded-lg text-lg font-semibold ${
+          disabled || isRolling
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-500 hover:bg-blue-600"
+        }`}
         onClick={rollDice}
         disabled={disabled || isRolling}
       >
