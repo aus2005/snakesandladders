@@ -95,3 +95,7 @@ button {
 .blue-dice {
   color: blue;
 }
+.ladder-image {
+  position: absolute;
+  z-index: 1;
+}

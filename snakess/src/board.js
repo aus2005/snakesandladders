@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from "react";
 import "./board.css";
 import DiceRoll from "./diceroll";
@@ -5,6 +7,10 @@ import { animateMove } from "./helpers";
 import snake1 from "./images/snake1.png";
 import snake2 from "./images/snake2.png";
 import snake3 from "./images/snake3.png";
+import ladder1 from "./images/ladder1.png";
+import ladder2 from "./images/ladder1.png";
+import ladder3 from "./images/ladder1.png";
+
 
 function Board() {
   const boardSize = 10;
@@ -17,7 +23,7 @@ function Board() {
   const [isMoving, setIsMoving] = useState(false);
   const [winner, setWinner] = useState(null);
   const [defeatedPlayer, setDefeatedPlayer] = useState(null);
-  const [snakeBiteMessage, setSnakeBiteMessage] = useState(null); // State for the snake bite message
+  const [snakeBiteMessage, setSnakeBiteMessage] = useState(null);
 
   const snakesAndLadders = {
     4: 25,
@@ -27,7 +33,7 @@ function Board() {
     50: 5,
     62: 81,
     95: 75,
-  };
+  }
 
   const snakes = [
     {
@@ -65,6 +71,71 @@ function Board() {
     },
   ];
 
+  const ladders = [
+    {
+      
+        image: ladder1,
+        position: {
+          top: "75%",  // Start from row 1 (2nd row)
+          left: "48%", // Start from column 4
+          width: "3.5%",  // Ladder width
+          transform: "rotate(35deg)", // Rotate the ladder for a more realistic look
+        },
+        start: 16,
+        end: 25,
+      
+      
+    },
+    {
+      image: ladder2,
+      position: {
+        top: "47%",
+        left: "71%",
+        width: "7.5%",
+        transform: "rotate( 0deg)",
+      },
+      start: 33,
+      end: 53,
+    },
+    {
+      image: ladder3,
+      position: {
+        top: "3.5%",
+        left: "15%",
+        width: "10%",
+        transform: "rotate(-25deg)",
+      },
+      start: 78,
+      end: 99,
+    },
+    {
+      image: ladder1,
+      position: {
+        top: "51%",
+        left: "10%",
+        width: "9%",
+        height: "28%",
+        transform: "rotate(-45deg)",
+      },
+      start: 28,
+      end: 50,
+    },
+    {
+      image: ladder2,
+      position: {
+        top: "15%",
+        left: "87%",
+        width: "4%",
+        transform: "rotate(39deg)",
+      },
+      start: 72,
+      end: 81,
+    },
+  ];
+  
+ 
+
+
   const handleDiceRoll = async (roll) => {
     if (isMoving || winner || defeatedPlayer) return;
 
@@ -86,12 +157,20 @@ function Board() {
       return;
     }
 
+    const ladder = ladders.find((ladder) => ladder.start === targetPosition);
+if (ladder) {
+  setTimeout(() => {
+    setPosition(ladder.end);  // Move player to the top of the ladder
+  }, 1500);
+  targetPosition = ladder.end; // Set target position to the ladder's top
+}
+
+
     try {
       const snake = snakes.find((snake) => snake.start === targetPosition);
       if (snake) {
         setSnakeBiteMessage(`Oopsie! Bitten by a snake! 😱`);
         setTimeout(() => {
-          // Move the player to the start of the snake's tail position
           setPosition(snake.end);  // Move player to the snake's tail (end position)
           setSnakeBiteMessage(null);
         }, 1500);
@@ -181,6 +260,21 @@ function Board() {
                 style={{
                   position: "absolute",
                   ...snake.position,
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="ladders-container">
+            {ladders.map((ladder, index) => (
+              <img
+                key={index}
+                src={ladder.image}
+                alt={`Ladder from ${ladder.start} to ${ladder.end}`}
+                className="ladder-image"
+                style={{
+                  position: "absolute",
+                  ...ladder.position,
                 }}
               />
             ))}
