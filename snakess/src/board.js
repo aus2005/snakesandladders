@@ -171,7 +171,7 @@ function Board() {
       }
 
       if (targetPosition === totalCells) {
-        setWinner(isPlayerOneTurn ? "Player 1 (🔴)" : "Player 2 (🔵)");
+        setWinner(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
         setIsMoving(false);
         return;
       }
@@ -184,7 +184,7 @@ function Board() {
           finishTurn();
         }, 2000);
       } else if (!isPlayerOneTurn && targetPosition === player1Position) {
-        setDefeatedPlayer("Player 1 (🔴)");
+        setDefeatedPlayer("Player 1 (🟢)");
         setTimeout(() => {
           setPlayer1Position(1);
           setDefeatedPlayer(null);
@@ -222,10 +222,10 @@ function Board() {
                 {player1Position === number && (
                   <div
                     className={`player player1 ${
-                      defeatedPlayer === "Player 1 (🔴)" ? "shake" : ""
+                      defeatedPlayer === "Player 1 (🟢)" ? "shake" : ""
                     }`}
                   >
-                    🔴
+                    🟢
                   </div>
                 )}
                 {player2Position === number && (
@@ -294,7 +294,7 @@ function Board() {
       )}
       {!winner && !defeatedPlayer && (
         <p>
-          Current Turn: {isPlayerOneTurn ? "Player 1 (🔴)" : "Player 2 (🔵)"}
+          Current Turn: {isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)"}
         </p>
       )}
 
