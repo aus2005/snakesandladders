@@ -97,7 +97,7 @@ function Board() {
       },
       start: 78,
       end: 99,
-      path: [88.5, 89],
+      path: [88.5, 89, 99],
     },
     {
       image: ladder1,
