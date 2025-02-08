@@ -116,3 +116,63 @@ button {
   border-radius: 50%;
   padding: 5px;
 }
+
+
+.animate-victory {
+  animation: bounce 1s ease infinite;
+}
+
+.play-again-button {
+  padding: 10px 20px;
+  font-size: 1.2em;
+  border-radius: 8px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.2s;
+}
+
+.play-again-button:hover {
+  transform: scale(1.05);
+}
+
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.confetti {
+  position: absolute;
+  left: var(--x);
+  top: -20px;
+  width: var(--size);
+  height: var(--size);
+  background: var(--color);
+  border-radius: 2px;
+  animation: confetti-fall 3s linear infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.victory-container {
+  text-align: center;
+  position: relative;
+  z-index: 1001;
+}

@@ -22,8 +22,7 @@ function Board() {
   const [defeatedPlayer, setDefeatedPlayer] = useState(null);
   const [snakeBiteMessage, setSnakeBiteMessage] = useState(null);
   const [affectedPlayer, setAffectedPlayer] = useState(null);
-
-
+  const [showVictoryAnimation, setShowVictoryAnimation] = useState(false);
 
   const snakes = [
     {
@@ -128,6 +127,20 @@ function Board() {
     },
   ];
 
+  const resetGame = () => {
+    setPlayer1Position(1);
+    setPlayer2Position(1);
+    setIsPlayerOneTurn(true);
+    setDiceValue(null);
+    setShowDiceResult(false);
+    setIsMoving(false);
+    setWinner(null);
+    setDefeatedPlayer(null);
+    setSnakeBiteMessage(null);
+    setAffectedPlayer(null);
+    setShowVictoryAnimation(false);
+  };
+
   const animatePathMove = async (path, setPosition) => {
     for (let i = 0; i < path.length; i++) {
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -169,7 +182,7 @@ function Board() {
       const snake = snakes.find((snake) => snake.start === targetPosition);
       if (snake) {
         setAffectedPlayer(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
-        setSnakeBiteMessage(`Oopsie! Bitten by a snake! 😱`);
+        setSnakeBiteMessage("Oopsie! Bitten by a snake! 😱");
         await animatePathMove(snake.path, setPosition);
         setTimeout(() => {
           setSnakeBiteMessage(null);
@@ -179,7 +192,9 @@ function Board() {
       }
 
       if (targetPosition === totalCells) {
-        setWinner(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
+        const winningPlayer = isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)";
+        setWinner(winningPlayer);
+        setShowVictoryAnimation(true);
         setIsMoving(false);
         return;
       }
@@ -228,25 +243,24 @@ function Board() {
               >
                 {number}
                 {player1Position === number && (
-  <div
-    className={`player player1 ${
-      affectedPlayer === "Player 1 (🟢)" ? "shine-effect" : ""
-    } ${defeatedPlayer === "Player 1 (🟢)" ? "shake" : ""}`}
-  >
-    🟢
-  </div>
-)}
+                  <div
+                    className={`player player1 ${
+                      affectedPlayer === "Player 1 (🟢)" ? "shine-effect" : ""
+                    } ${defeatedPlayer === "Player 1 (🟢)" ? "shake" : ""}`}
+                  >
+                    🟢
+                  </div>
+                )}
 
-{player2Position === number && (
-  <div
-    className={`player player2 ${
-      affectedPlayer === "Player 2 (🔵)" ? "shine-effect" : ""
-    } ${defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""}`}
-  >
-    🔵
-  </div>
-)}
-
+                {player2Position === number && (
+                  <div
+                    className={`player player2 ${
+                      affectedPlayer === "Player 2 (🔵)" ? "shine-effect" : ""
+                    } ${defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""}`}
+                  >
+                    🔵
+                  </div>
+                )}
               </div>
             );
           })}
@@ -298,7 +312,33 @@ function Board() {
         </div>
       )}
 
-      {winner && <h2 className="winner-message">🎉 {winner} WINS! 🎉</h2>}
+{winner && (
+        <div className="victory-container">
+          <div className="confetti-container">
+            {Array.from({ length: 100 }).map((_, i) => (
+              <div key={i} className="confetti" style={{
+                "--x": `${Math.random() * 100}vw`,
+                "--y": `${Math.random() * 100}vh`,
+                "--delay": `${Math.random() * 3}s`,
+                "--size": `${Math.random() * 10 + 5}px`,
+                "--rotation": `${Math.random() * 360}deg`,
+                "--color": `hsl(${Math.random() * 360}, 70%, 50%)`
+              }}></div>
+            ))}
+          </div>
+          <h2 className="winner-message animate-victory">
+            🎉 {winner} WINS! 🎉
+          </h2>
+          <button 
+            onClick={resetGame}
+            className="play-again-button"
+          >
+            Play Again 🎲
+          </button>
+        </div>
+      )}
+
+      
       {defeatedPlayer && (
         <h2 className="defeat-message">💥 {defeatedPlayer} was CAPTURED! 💥</h2>
       )}
