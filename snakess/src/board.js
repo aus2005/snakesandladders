@@ -172,6 +172,8 @@ if (ladder) {
         setSnakeBiteMessage(`Oopsie! Bitten by a snake! 😱`);
         setTimeout(() => {
           setPosition(snake.end);  // Move player to the snake's tail (end position)
+       
+          setPosition(snake.end); 
           setSnakeBiteMessage(null);
         }, 1500);
         targetPosition = snake.end; // Set target position to the snake's tail
