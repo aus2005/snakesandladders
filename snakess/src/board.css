@@ -45,6 +45,7 @@
   grid-template-rows: repeat(10, 1fr);
   position: relative;
 }
+.ladder
 .snake {
   position: absolute;
   width: 100%;
@@ -101,4 +102,17 @@ button {
 .ladder-image {
   position: absolute;
   z-index: 1;
+}
+
+@keyframes shine {
+  0% { box-shadow: 0 0 5px #ffcc00; }
+  50% { box-shadow: 0 0 15px #ffcc00; }
+  100% { box-shadow: 0 0 5px #ffcc00; }
+}
+
+.shine-effect {
+  animation: shine 1s ease-in-out infinite alternate;
+  background-color: rgba(255, 204, 0, 0.3);
+  border-radius: 50%;
+  padding: 5px;
 }

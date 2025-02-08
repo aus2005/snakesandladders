@@ -21,6 +21,8 @@ function Board() {
   const [winner, setWinner] = useState(null);
   const [defeatedPlayer, setDefeatedPlayer] = useState(null);
   const [snakeBiteMessage, setSnakeBiteMessage] = useState(null);
+  const [affectedPlayer, setAffectedPlayer] = useState(null);
+
 
 
   const snakes = [
@@ -58,7 +60,7 @@ function Board() {
       },
       start: 67,
       end: 49,
-      path: [68, 57, 58, 59, 48, 49],
+      path: [68, 57, 47, 58, 59, 48, 49],
     },
   ];
 
@@ -128,7 +130,7 @@ function Board() {
 
   const animatePathMove = async (path, setPosition) => {
     for (let i = 0; i < path.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       setPosition(path[i]);
     }
   };
@@ -158,15 +160,21 @@ function Board() {
 
       const ladder = ladders.find((ladder) => ladder.start === targetPosition);
       if (ladder) {
+        setAffectedPlayer(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
         await animatePathMove(ladder.path, setPosition);
+        setTimeout(() => setAffectedPlayer(null), 1000);
         targetPosition = ladder.end;
       }
 
       const snake = snakes.find((snake) => snake.start === targetPosition);
       if (snake) {
+        setAffectedPlayer(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
         setSnakeBiteMessage(`Oopsie! Bitten by a snake! 😱`);
         await animatePathMove(snake.path, setPosition);
-        setSnakeBiteMessage(null);
+        setTimeout(() => {
+          setSnakeBiteMessage(null);
+          setAffectedPlayer(null);
+        }, 1000);
         targetPosition = snake.end;
       }
 
@@ -220,23 +228,25 @@ function Board() {
               >
                 {number}
                 {player1Position === number && (
-                  <div
-                    className={`player player1 ${
-                      defeatedPlayer === "Player 1 (🟢)" ? "shake" : ""
-                    }`}
-                  >
-                    🟢
-                  </div>
-                )}
-                {player2Position === number && (
-                  <div
-                    className={`player player2 ${
-                      defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""
-                    }`}
-                  >
-                    🔵
-                  </div>
-                )}
+  <div
+    className={`player player1 ${
+      affectedPlayer === "Player 1 (🟢)" ? "shine-effect" : ""
+    } ${defeatedPlayer === "Player 1 (🟢)" ? "shake" : ""}`}
+  >
+    🟢
+  </div>
+)}
+
+{player2Position === number && (
+  <div
+    className={`player player2 ${
+      affectedPlayer === "Player 2 (🔵)" ? "shine-effect" : ""
+    } ${defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""}`}
+  >
+    🔵
+  </div>
+)}
+
               </div>
             );
           })}
