@@ -1,0 +1,68 @@
+return (
+    <div className="game-container">
+      <div className="board">
+        {/* Add the cells */}
+        {Array.from({ length: totalCells }, (_, i) => {
+          const number = totalCells - i;
+          return (
+            <div
+              key={number}
+              className={`cell ${(Math.floor(i / boardSize) + i) % 2 === 0 ? "red" : "white"}`}
+            >
+              {number}
+              {player1Position === number && (
+                <div className={`player player1 ${defeatedPlayer === "Player 1 (🔴)" ? "shake" : ""}`}>
+                  🔴
+                </div>
+              )}
+              {player2Position === number && (
+                <div className={`player player2 ${defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""}`}>
+                  🔵
+                </div>
+              )}
+            </div>
+          );
+        })}
+  
+        {/* Snakes */}
+        <div className="snakes-container">
+          {snakes.map((snake, index) => (
+            <img
+              key={index}
+              src={snake.image}
+              alt={`Snake from ${snake.start} to ${snake.end}`}
+              className="snake-image"
+              style={{
+                position: 'absolute',
+                left: `${(snake.start % boardSize) * (500 / boardSize)}px`,  // Calculate the column position based on snake's start
+                top: `${Math.floor(snake.start / boardSize) * (500 / boardSize)}px`,  // Calculate the row position based on snake's start
+                width: '50px',  // Adjust snake width
+                height: '50px', // Adjust snake height
+                zIndex: 1,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+  
+      {/* Dice Roll */}
+      {!winner && (
+        <div className={`dice-container ${isPlayerOneTurn ? "left" : "right"}`}>
+          <DiceRoll
+            onRoll={handleDiceRoll}
+            disabled={isMoving || !!defeatedPlayer || !!winner}
+          />
+          {showDiceResult && <p>You rolled: {diceValue}</p>}
+        </div>
+      )}
+  
+      {winner && <h2 className="winner-message">🎉 {winner} WINS! 🎉</h2>}
+      {defeatedPlayer && <h2 className="defeat-message">💥 {defeatedPlayer} was CAPTURED! 💥</h2>}
+      {!winner && !defeatedPlayer && (
+        <p>Current Turn: {isPlayerOneTurn ? "Player 1 (🔴)" : "Player 2 (🔵)"}</p>
+      )}
+    </div>
+  );
+}  
+
+export default Board;

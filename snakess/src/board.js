@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./board.css";
 import DiceRoll from "./diceroll";
 import { animateMove } from "./helpers";
+import snake1 from "./images/snake1.png";
+import snake2 from "./images/snake2.png";
+import snake3 from "./images/snake3.png";
 
 function Board() {
   const boardSize = 10;
@@ -14,10 +17,53 @@ function Board() {
   const [isMoving, setIsMoving] = useState(false);
   const [winner, setWinner] = useState(null);
   const [defeatedPlayer, setDefeatedPlayer] = useState(null);
+  const [snakeBiteMessage, setSnakeBiteMessage] = useState(null); // State for the snake bite message
 
   const snakesAndLadders = {
-    4: 25, 8: 30, 28: 14, 40: 42, 50: 5, 62: 81, 95: 75
+    4: 25,
+    8: 30,
+    28: 14,
+    40: 42,
+    50: 5,
+    62: 81,
+    95: 75,
   };
+
+  const snakes = [
+    {
+      image: snake1,
+      position: {
+        top: "65%",
+        left: "35%",
+        width: "40%",
+        transform: "rotate(20deg)",
+      },
+      start: 23,
+      end: 7,
+    },
+    {
+      image: snake2,
+      position: {
+        top: "-6%",
+        left: "43%",
+        width: "40%",
+        transform: "rotate(-20deg)",
+      },
+      start: 97,
+      end: 41,
+    },
+    {
+      image: snake3,
+      position: {
+        top: "30%",
+        left: "10%",
+        width: "30%",
+        transform: "rotate(1deg)",
+      },
+      start: 67,
+      end: 49,
+    },
+  ];
 
   const handleDiceRoll = async (roll) => {
     if (isMoving || winner || defeatedPlayer) return;
@@ -27,36 +73,39 @@ function Board() {
     setIsMoving(true);
 
     const currentPosition = isPlayerOneTurn ? player1Position : player2Position;
-    const setPosition = isPlayerOneTurn ? setPlayer1Position : setPlayer2Position;
+    const setPosition = isPlayerOneTurn
+      ? setPlayer1Position
+      : setPlayer2Position;
 
     let targetPosition = currentPosition + roll;
 
     if (targetPosition > totalCells) {
-      // If the roll goes beyond the total cells, stop the turn and skip to the next player
       setIsMoving(false);
       setShowDiceResult(false);
-      finishTurn();  // End the turn immediately
+      finishTurn();
       return;
     }
 
-    // Move piece according to dice roll
     try {
-      if (snakesAndLadders[targetPosition]) {
-        const newTarget = snakesAndLadders[targetPosition];
-        setPosition(newTarget); // Move directly to the snake/ladder destination
-        targetPosition = newTarget; // Update the target position
+      const snake = snakes.find((snake) => snake.start === targetPosition);
+      if (snake) {
+        setSnakeBiteMessage(`Oopsie! Bitten by a snake! 😱`);
+        setTimeout(() => {
+          // Move the player to the start of the snake's tail position
+          setPosition(snake.end);  // Move player to the snake's tail (end position)
+          setSnakeBiteMessage(null);
+        }, 1500);
+        targetPosition = snake.end; // Set target position to the snake's tail
       } else {
         await animateMove(currentPosition, targetPosition, setPosition);
       }
 
-      // Check win condition
       if (targetPosition === totalCells) {
         setWinner(isPlayerOneTurn ? "Player 1 (🔴)" : "Player 2 (🔵)");
         setIsMoving(false);
         return;
       }
 
-      // Check collision
       if (isPlayerOneTurn && targetPosition === player2Position) {
         setDefeatedPlayer("Player 2 (🔵)");
         setTimeout(() => {
@@ -83,46 +132,89 @@ function Board() {
   const finishTurn = () => {
     setIsMoving(false);
     setShowDiceResult(false);
-    setIsPlayerOneTurn(!isPlayerOneTurn);  // Switch to the next player's turn
+    setIsPlayerOneTurn(!isPlayerOneTurn);
   };
 
   return (
     <div className="game-container">
-      <div className="board">
-        {Array.from({ length: totalCells }, (_, i) => {
-          const number = totalCells - i;
-          return (
-            <div key={number} className={`cell ${(Math.floor(i / boardSize) + i) % 2 === 0 ? "red" : "white"}`}>
-              {number}
-              {player1Position === number && (
-                <div className={`player player1 ${defeatedPlayer === "Player 1 (🔴)" ? "shake" : ""}`}>
-                  🔴
-                </div>
-              )}
-              {player2Position === number && (
-                <div className={`player player2 ${defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""}`}>
-                  🔵
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <div className="board-wrapper">
+        <div className="board">
+          {Array.from({ length: totalCells }, (_, i) => {
+            const number = totalCells - i;
+            return (
+              <div
+                key={number}
+                className={`cell ${
+                  (Math.floor(i / boardSize) + i) % 2 === 0 ? "red" : "white"
+                }`}
+              >
+                {number}
+                {player1Position === number && (
+                  <div
+                    className={`player player1 ${
+                      defeatedPlayer === "Player 1 (🔴)" ? "shake" : ""
+                    }`}
+                  >
+                    🔴
+                  </div>
+                )}
+                {player2Position === number && (
+                  <div
+                    className={`player player2 ${
+                      defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""
+                    }`}
+                  >
+                    🔵
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          <div className="snakes-container">
+            {snakes.map((snake, index) => (
+              <img
+                key={index}
+                src={snake.image}
+                alt={`Snake from ${snake.start} to ${snake.end}`}
+                className="snake-image"
+                style={{
+                  position: "absolute",
+                  ...snake.position,
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {!winner && (
-        <div className={`dice-container ${isPlayerOneTurn ? "left" : "right"}`}>
-          <DiceRoll 
-            onRoll={handleDiceRoll} 
+        <div
+          className={`dice-container ${
+            isPlayerOneTurn ? "left red-dice" : "right blue-dice"
+          }`}
+        >
+          <DiceRoll
+            onRoll={handleDiceRoll}
             disabled={isMoving || !!defeatedPlayer || !!winner}
+            diceClass={isPlayerOneTurn ? "red-dice" : "blue-dice"}
           />
           {showDiceResult && <p>You rolled: {diceValue}</p>}
         </div>
       )}
 
       {winner && <h2 className="winner-message">🎉 {winner} WINS! 🎉</h2>}
-      {defeatedPlayer && <h2 className="defeat-message">💥 {defeatedPlayer} was CAPTURED! 💥</h2>}
+      {defeatedPlayer && (
+        <h2 className="defeat-message">💥 {defeatedPlayer} was CAPTURED! 💥</h2>
+      )}
       {!winner && !defeatedPlayer && (
-        <p>Current Turn: {isPlayerOneTurn ? "Player 1 (🔴)" : "Player 2 (🔵)"}</p>
+        <p>
+          Current Turn: {isPlayerOneTurn ? "Player 1 (🔴)" : "Player 2 (🔵)"}
+        </p>
+      )}
+
+      {snakeBiteMessage && (
+        <h2 className="snake-bite-message">{snakeBiteMessage}</h2>
       )}
     </div>
   );
