@@ -22,7 +22,7 @@ function DiceFace({ dots, rotation }) {
   );
 }
 
-function Dice({ number, isRolling }) {
+function Dice({ number, isRolling,color }) {
   const dotPositions = {
     1: [[0, 0]],
     2: [
@@ -86,7 +86,7 @@ function Dice({ number, isRolling }) {
     <animated.group rotation={rotation}>
       <mesh>
         <primitive object={new RoundedBoxGeometry(1, 1, 1, 6, 0.2)} />
-        <meshBasicMaterial color="red" />
+        <meshBasicMaterial color={color} />
       </mesh>
       {[1, 2, 3, 4, 5, 6].map((face) => (
         <DiceFace
@@ -99,7 +99,7 @@ function Dice({ number, isRolling }) {
   );
 }
 
-function DiceRoll({ onRoll, disabled }) {
+function DiceRoll({ onRoll, disabled, diceClass }) {
   const [roll, setRoll] = useState(1);
   const [isRolling, setIsRolling] = useState(false);
 
@@ -123,12 +123,15 @@ function DiceRoll({ onRoll, disabled }) {
     }, 1000);
   };
 
+  // Determine the dice color based on the player's turn
+  const diceColor = diceClass === "red-dice" ? "red" : "blue";
+
   return (
     <div className="w-32 h-32 flex flex-col items-center justify-center">
       <Canvas className="w-full h-full" camera={{ position: [0, 0, 3] }}>
         <ambientLight intensity={0.5} />
         <spotLight position={[3, 3, 3]} angle={0.3} intensity={0.8} />
-        <Dice number={roll} isRolling={isRolling} />
+        <Dice number={roll} isRolling={isRolling} color={diceColor} />
       </Canvas>
       <button
         className={`mt-4 px-6 py-2 rounded-lg text-lg font-semibold ${
