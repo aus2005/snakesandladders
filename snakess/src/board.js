@@ -1,6 +1,4 @@
-
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./board.css";
 import DiceRoll from "./diceroll";
 import { animateMove } from "./helpers";
@@ -10,7 +8,6 @@ import snake3 from "./images/snake3.png";
 import ladder1 from "./images/ladder1.png";
 import ladder2 from "./images/ladder1.png";
 import ladder3 from "./images/ladder1.png";
-
 
 function Board() {
   const boardSize = 10;
@@ -25,15 +22,6 @@ function Board() {
   const [defeatedPlayer, setDefeatedPlayer] = useState(null);
   const [snakeBiteMessage, setSnakeBiteMessage] = useState(null);
 
-  const snakesAndLadders = {
-    4: 25,
-    8: 30,
-    28: 14,
-    40: 42,
-    50: 5,
-    62: 81,
-    95: 75,
-  }
 
   const snakes = [
     {
@@ -46,6 +34,7 @@ function Board() {
       },
       start: 23,
       end: 7,
+      path: [14.5, 15, 6, 7],
     },
     {
       image: snake2,
@@ -57,6 +46,7 @@ function Board() {
       },
       start: 97,
       end: 41,
+      path: [86, 76, 65, 54, 43, 42, 41],
     },
     {
       image: snake3,
@@ -68,23 +58,22 @@ function Board() {
       },
       start: 67,
       end: 49,
+      path: [68, 57, 58, 59, 48, 49],
     },
   ];
 
   const ladders = [
     {
-      
-        image: ladder1,
-        position: {
-          top: "75%",  // Start from row 1 (2nd row)
-          left: "48%", // Start from column 4
-          width: "3.5%",  // Ladder width
-          transform: "rotate(35deg)", // Rotate the ladder for a more realistic look
-        },
-        start: 16,
-        end: 25,
-      
-      
+      image: ladder1,
+      position: {
+        top: "75%",
+        left: "48%",
+        width: "3.5%",
+        transform: "rotate(35deg)",
+      },
+      start: 16,
+      end: 25,
+      path: [25],
     },
     {
       image: ladder2,
@@ -92,10 +81,11 @@ function Board() {
         top: "47%",
         left: "71%",
         width: "7.5%",
-        transform: "rotate( 0deg)",
+        transform: "rotate(0deg)",
       },
       start: 33,
       end: 53,
+      path: [43, 53],
     },
     {
       image: ladder3,
@@ -107,6 +97,7 @@ function Board() {
       },
       start: 78,
       end: 99,
+      path: [88.5, 89],
     },
     {
       image: ladder1,
@@ -119,6 +110,7 @@ function Board() {
       },
       start: 28,
       end: 50,
+      path: [39, 50],
     },
     {
       image: ladder2,
@@ -130,11 +122,16 @@ function Board() {
       },
       start: 72,
       end: 81,
+      path: [81],
     },
   ];
-  
- 
 
+  const animatePathMove = async (path, setPosition) => {
+    for (let i = 0; i < path.length; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setPosition(path[i]);
+    }
+  };
 
   const handleDiceRoll = async (roll) => {
     if (isMoving || winner || defeatedPlayer) return;
@@ -144,41 +141,33 @@ function Board() {
     setIsMoving(true);
 
     const currentPosition = isPlayerOneTurn ? player1Position : player2Position;
-    const setPosition = isPlayerOneTurn
-      ? setPlayer1Position
-      : setPlayer2Position;
+    const setPosition = isPlayerOneTurn ? setPlayer1Position : setPlayer2Position;
 
     let targetPosition = currentPosition + roll;
 
     if (targetPosition > totalCells) {
-      setIsMoving(false);
-      setShowDiceResult(false);
-      finishTurn();
+      setTimeout(() => {
+        setIsMoving(false);
+        finishTurn();
+      }, 1000);
       return;
     }
 
-    const ladder = ladders.find((ladder) => ladder.start === targetPosition);
-if (ladder) {
-  setTimeout(() => {
-    setPosition(ladder.end);  // Move player to the top of the ladder
-  }, 1500);
-  targetPosition = ladder.end; // Set target position to the ladder's top
-}
-
-
     try {
+      await animateMove(currentPosition, targetPosition, setPosition);
+
+      const ladder = ladders.find((ladder) => ladder.start === targetPosition);
+      if (ladder) {
+        await animatePathMove(ladder.path, setPosition);
+        targetPosition = ladder.end;
+      }
+
       const snake = snakes.find((snake) => snake.start === targetPosition);
       if (snake) {
         setSnakeBiteMessage(`Oopsie! Bitten by a snake! 😱`);
-        setTimeout(() => {
-          setPosition(snake.end);  // Move player to the snake's tail (end position)
-       
-          setPosition(snake.end); 
-          setSnakeBiteMessage(null);
-        }, 1500);
-        targetPosition = snake.end; // Set target position to the snake's tail
-      } else {
-        await animateMove(currentPosition, targetPosition, setPosition);
+        await animatePathMove(snake.path, setPosition);
+        setSnakeBiteMessage(null);
+        targetPosition = snake.end;
       }
 
       if (targetPosition === totalCells) {
