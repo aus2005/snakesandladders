@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    
     "@react-spring/three": "^9.7.5",
     "@react-three/drei": "^9.121.4",
     "@react-three/fiber": "^8.17.14",
@@ -37,6 +38,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "@mediapipe/tasks-vision": "none"
   },
   "devDependencies": {
     "web-vitals": "^4.2.4"

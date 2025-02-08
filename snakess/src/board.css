@@ -44,3 +44,16 @@ button {
   font-size: 18px;
   cursor: pointer;
 }
+.dice-container {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.left {
+  left: 10px;
+}
+
+.right {
+  right: 10px;
+}
