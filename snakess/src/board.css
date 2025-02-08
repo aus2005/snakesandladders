@@ -63,6 +63,12 @@ button {
   top: 50%;
   transform: translateY(-50%);
 }
+.red-dice {color:red
+}
+
+.blue-dice {
+  color: blue;
+}
 
 .left {
   left: 10px;
@@ -81,17 +87,4 @@ button {
   z-index: 10;
   font-weight: bold;
 }
-.dice-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 
-}
-
-.red-dice {
-  color:red
-}
-
-.blue-dice {
-  color: blue;
-}
