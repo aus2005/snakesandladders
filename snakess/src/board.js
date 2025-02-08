@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import "./board.css";
 import DiceRoll from "./diceroll"; 
+import "./helpers";
 
-const Board = () => {
+
+function Board() {
   const boardSize = 10;
   const totalCells = 100;
   const [playerPosition, setPlayerPosition] = useState(1);
@@ -14,13 +16,31 @@ const Board = () => {
 
   const handleDiceRoll = (roll) => {
     setDiceValue(roll);
-    let newPosition = playerPosition + roll;
-    if (newPosition > totalCells) return;
-    if (snakesAndLadders[newPosition]) {
-      newPosition = snakesAndLadders[newPosition];
+    let targetPosition = playerPosition + roll;
+
+    if (targetPosition > totalCells) return;
+
+    // Check for snakes and ladders
+    if (snakesAndLadders[targetPosition]) {
+      targetPosition = snakesAndLadders[targetPosition];
     }
-    setPlayerPosition(newPosition);
+
+    // Animate the movement step-by-step
+    animateMove(playerPosition, targetPosition);
   };
+  const animateMove = (current, target) => {
+    let step = 1;
+
+    const interval = setInterval(() => {
+      if (current < target) {
+        current += step;
+        setPlayerPosition(current);
+      } else {
+        clearInterval(interval);
+      }
+    }, 600); // Moves every 300ms
+  };
+
 
   return (
     <div className="game-container">
@@ -35,10 +55,11 @@ const Board = () => {
           );
         })}
       </div>
-      <DiceRoll onRoll={handleDiceRoll} /> 
+      <DiceRoll onRoll={handleDiceRoll} />
       <p>Dice Roll: {diceValue}</p>
     </div>
   );
-};
+
+}
 
 export default Board;
