@@ -124,7 +124,7 @@ function DiceRoll({ onRoll, disabled, diceClass }) {
   };
 
   // Determine the dice color based on the player's turn
-  const diceColor = diceClass === "red-dice" ? "red" : "blue";
+  const diceColor = diceClass === "green-dice" ? "green" : "blue";
 
   return (
     <div className="w-32 h-32 flex flex-col items-center justify-center">

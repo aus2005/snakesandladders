@@ -174,8 +174,12 @@ function Board() {
       const ladder = ladders.find((ladder) => ladder.start === targetPosition);
       if (ladder) {
         setAffectedPlayer(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
+        setSnakeBiteMessage("🌟Boosted! You climbed a ladder!");
         await animatePathMove(ladder.path, setPosition);
-        setTimeout(() => setAffectedPlayer(null), 1000);
+        setTimeout(() => {
+          setSnakeBiteMessage(null);
+          setAffectedPlayer(null);
+        }, 1000);
         targetPosition = ladder.end;
       }
 
@@ -246,7 +250,7 @@ function Board() {
                   <div
                     className={`player player1 ${
                       affectedPlayer === "Player 1 (🟢)" ? "shine-effect" : ""
-                    } ${defeatedPlayer === "Player 1 (🟢)" ? "shake" : ""}`}
+                    } ${defeatedPlayer === "Player 1 (🟢)" ? "shine-effect" : ""}`}
                   >
                     🟢
                   </div>
@@ -256,7 +260,7 @@ function Board() {
                   <div
                     className={`player player2 ${
                       affectedPlayer === "Player 2 (🔵)" ? "shine-effect" : ""
-                    } ${defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""}`}
+                    } ${defeatedPlayer === "Player 2 (🔵)" ? "shine-effect" : ""}`}
                   >
                     🔵
                   </div>
@@ -300,13 +304,13 @@ function Board() {
       {!winner && (
         <div
           className={`dice-container ${
-            isPlayerOneTurn ? "left red-dice" : "right blue-dice"
+            isPlayerOneTurn ? "left green-dice" : "right blue-dice"
           }`}
         >
           <DiceRoll
             onRoll={handleDiceRoll}
             disabled={isMoving || !!defeatedPlayer || !!winner}
-            diceClass={isPlayerOneTurn ? "red-dice" : "blue-dice"}
+            diceClass={isPlayerOneTurn ? "green-dice" : "blue-dice"}
           />
           {showDiceResult && <p>You rolled: {diceValue}</p>}
         </div>
