@@ -8,6 +8,7 @@ import snake3 from "./images/snake3.png";
 import ladder1 from "./images/ladder1.png";
 import ladder2 from "./images/ladder1.png";
 import ladder3 from "./images/ladder1.png";
+import { motion } from "framer-motion";
 
 function Board() {
   const boardSize = 10;
@@ -21,7 +22,6 @@ function Board() {
   const [winner, setWinner] = useState(null);
   const [defeatedPlayer, setDefeatedPlayer] = useState(null);
   const [snakeBiteMessage, setSnakeBiteMessage] = useState(null);
-
 
   const snakes = [
     {
@@ -141,7 +141,9 @@ function Board() {
     setIsMoving(true);
 
     const currentPosition = isPlayerOneTurn ? player1Position : player2Position;
-    const setPosition = isPlayerOneTurn ? setPlayer1Position : setPlayer2Position;
+    const setPosition = isPlayerOneTurn
+      ? setPlayer1Position
+      : setPlayer2Position;
 
     let targetPosition = currentPosition + roll;
 
@@ -184,7 +186,7 @@ function Board() {
           finishTurn();
         }, 2000);
       } else if (!isPlayerOneTurn && targetPosition === player1Position) {
-        setDefeatedPlayer("Player 1 (🟢)");
+        setDefeatedPlayer("Player 1 (🔴)");
         setTimeout(() => {
           setPlayer1Position(1);
           setDefeatedPlayer(null);
@@ -217,25 +219,34 @@ function Board() {
                 className={`cell ${
                   (Math.floor(i / boardSize) + i) % 2 === 0 ? "red" : "white"
                 }`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
                 {number}
                 {player1Position === number && (
-                  <div
+                  <motion.div
+                    layoutId="player1"
                     className={`player player1 ${
-                      defeatedPlayer === "Player 1 (🟢)" ? "shake" : ""
+                      defeatedPlayer === "Player 1 (🔴)" ? "shake" : ""
                     }`}
                   >
-                    🟢
-                  </div>
+                    🔴
+                  </motion.div>
                 )}
                 {player2Position === number && (
-                  <div
+                  <motion.div
+                    layoutId="player2"
                     className={`player player2 ${
                       defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""
                     }`}
                   >
                     🔵
-                  </div>
+                  </motion.div>
                 )}
               </div>
             );
@@ -294,7 +305,7 @@ function Board() {
       )}
       {!winner && !defeatedPlayer && (
         <p>
-          Current Turn: {isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)"}
+          Current Turn: {isPlayerOneTurn ? "Player 1 (🔴)" : "Player 2 (🔵)"}
         </p>
       )}
 

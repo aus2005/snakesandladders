@@ -22,7 +22,7 @@ function DiceFace({ dots, rotation }) {
   );
 }
 
-function Dice({ number, isRolling,color }) {
+function Dice({ number, isRolling, color }) {
   const dotPositions = {
     1: [[0, 0]],
     2: [
@@ -98,18 +98,17 @@ function Dice({ number, isRolling,color }) {
     </animated.group>
   );
 }
+const diceSound = new Audio("/Dice Sound.mp3");
 
 function DiceRoll({ onRoll, disabled, diceClass }) {
   const [roll, setRoll] = useState(1);
   const [isRolling, setIsRolling] = useState(false);
 
-  const diceSound = new Audio("/Dice Sound.mp3");
-
   useEffect(() => {
     if (isRolling) {
       diceSound.play();
     }
-  }, [isRolling, diceSound]);
+  }, [isRolling]);
 
   const rollDice = () => {
     if (disabled || isRolling) return;
@@ -123,7 +122,6 @@ function DiceRoll({ onRoll, disabled, diceClass }) {
     }, 1000);
   };
 
-  // Determine the dice color based on the player's turn
   const diceColor = diceClass === "red-dice" ? "red" : "blue";
 
   return (
