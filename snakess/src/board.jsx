@@ -8,6 +8,7 @@ import snake3 from "./images/snake3.png";
 import ladder1 from "./images/ladder1.png";
 import ladder2 from "./images/ladder1.png";
 import ladder3 from "./images/ladder1.png";
+import { motion } from "framer-motion";
 
 function Board() {
   const boardSize = 10;
@@ -21,8 +22,6 @@ function Board() {
   const [winner, setWinner] = useState(null);
   const [defeatedPlayer, setDefeatedPlayer] = useState(null);
   const [snakeBiteMessage, setSnakeBiteMessage] = useState(null);
-  const [affectedPlayer, setAffectedPlayer] = useState(null);
-  const [showVictoryAnimation, setShowVictoryAnimation] = useState(false);
 
   const snakes = [
     {
@@ -59,7 +58,7 @@ function Board() {
       },
       start: 67,
       end: 49,
-      path: [68, 57, 47, 58, 59, 48, 49],
+      path: [68, 57, 58, 59, 48, 49],
     },
   ];
 
@@ -127,23 +126,9 @@ function Board() {
     },
   ];
 
-  const resetGame = () => {
-    setPlayer1Position(1);
-    setPlayer2Position(1);
-    setIsPlayerOneTurn(true);
-    setDiceValue(null);
-    setShowDiceResult(false);
-    setIsMoving(false);
-    setWinner(null);
-    setDefeatedPlayer(null);
-    setSnakeBiteMessage(null);
-    setAffectedPlayer(null);
-    setShowVictoryAnimation(false);
-  };
-
   const animatePathMove = async (path, setPosition) => {
     for (let i = 0; i < path.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       setPosition(path[i]);
     }
   };
@@ -156,7 +141,9 @@ function Board() {
     setIsMoving(true);
 
     const currentPosition = isPlayerOneTurn ? player1Position : player2Position;
-    const setPosition = isPlayerOneTurn ? setPlayer1Position : setPlayer2Position;
+    const setPosition = isPlayerOneTurn
+      ? setPlayer1Position
+      : setPlayer2Position;
 
     let targetPosition = currentPosition + roll;
 
@@ -173,32 +160,20 @@ function Board() {
 
       const ladder = ladders.find((ladder) => ladder.start === targetPosition);
       if (ladder) {
-        setAffectedPlayer(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
-        setSnakeBiteMessage("🌟Boosted! You climbed a ladder!");
         await animatePathMove(ladder.path, setPosition);
-        setTimeout(() => {
-          setSnakeBiteMessage(null);
-          setAffectedPlayer(null);
-        }, 1000);
         targetPosition = ladder.end;
       }
 
       const snake = snakes.find((snake) => snake.start === targetPosition);
       if (snake) {
-        setAffectedPlayer(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
-        setSnakeBiteMessage("Oopsie! Bitten by a snake! 😱");
+        setSnakeBiteMessage(`Oopsie! Bitten by a snake! 😱`);
         await animatePathMove(snake.path, setPosition);
-        setTimeout(() => {
-          setSnakeBiteMessage(null);
-          setAffectedPlayer(null);
-        }, 1000);
+        setSnakeBiteMessage(null);
         targetPosition = snake.end;
       }
 
       if (targetPosition === totalCells) {
-        const winningPlayer = isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)";
-        setWinner(winningPlayer);
-        setShowVictoryAnimation(true);
+        setWinner(isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)");
         setIsMoving(false);
         return;
       }
@@ -211,7 +186,7 @@ function Board() {
           finishTurn();
         }, 2000);
       } else if (!isPlayerOneTurn && targetPosition === player1Position) {
-        setDefeatedPlayer("Player 1 (🟢)");
+        setDefeatedPlayer("Player 1 (🔴)");
         setTimeout(() => {
           setPlayer1Position(1);
           setDefeatedPlayer(null);
@@ -244,26 +219,34 @@ function Board() {
                 className={`cell ${
                   (Math.floor(i / boardSize) + i) % 2 === 0 ? "red" : "white"
                 }`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
                 {number}
                 {player1Position === number && (
-                  <div
+                  <motion.div
+                    layoutId="player1"
                     className={`player player1 ${
-                      affectedPlayer === "Player 1 (🟢)" ? "shine-effect" : ""
-                    } ${defeatedPlayer === "Player 1 (🟢)" ? "shine-effect" : ""}`}
+                      defeatedPlayer === "Player 1 (🔴)" ? "shake" : ""
+                    }`}
                   >
-                    🟢
-                  </div>
+                    🔴
+                  </motion.div>
                 )}
-
                 {player2Position === number && (
-                  <div
+                  <motion.div
+                    layoutId="player2"
                     className={`player player2 ${
-                      affectedPlayer === "Player 2 (🔵)" ? "shine-effect" : ""
-                    } ${defeatedPlayer === "Player 2 (🔵)" ? "shine-effect" : ""}`}
+                      defeatedPlayer === "Player 2 (🔵)" ? "shake" : ""
+                    }`}
                   >
                     🔵
-                  </div>
+                  </motion.div>
                 )}
               </div>
             );
@@ -304,51 +287,25 @@ function Board() {
       {!winner && (
         <div
           className={`dice-container ${
-            isPlayerOneTurn ? "left green-dice" : "right blue-dice"
+            isPlayerOneTurn ? "left red-dice" : "right blue-dice"
           }`}
         >
           <DiceRoll
             onRoll={handleDiceRoll}
             disabled={isMoving || !!defeatedPlayer || !!winner}
-            diceClass={isPlayerOneTurn ? "green-dice" : "blue-dice"}
+            diceClass={isPlayerOneTurn ? "red-dice" : "blue-dice"}
           />
           {showDiceResult && <p>You rolled: {diceValue}</p>}
         </div>
       )}
 
-{winner && (
-        <div className="victory-container">
-          <div className="confetti-container">
-            {Array.from({ length: 100 }).map((_, i) => (
-              <div key={i} className="confetti" style={{
-                "--x": `${Math.random() * 100}vw`,
-                "--y": `${Math.random() * 100}vh`,
-                "--delay": `${Math.random() * 3}s`,
-                "--size": `${Math.random() * 10 + 5}px`,
-                "--rotation": `${Math.random() * 360}deg`,
-                "--color": `hsl(${Math.random() * 360}, 70%, 50%)`
-              }}></div>
-            ))}
-          </div>
-          <h2 className="winner-message animate-victory">
-            🎉 {winner} WINS! 🎉
-          </h2>
-          <button 
-            onClick={resetGame}
-            className="play-again-button"
-          >
-            Play Again 🎲
-          </button>
-        </div>
-      )}
-
-      
+      {winner && <h2 className="winner-message">🎉 {winner} WINS! 🎉</h2>}
       {defeatedPlayer && (
         <h2 className="defeat-message">💥 {defeatedPlayer} was CAPTURED! 💥</h2>
       )}
       {!winner && !defeatedPlayer && (
         <p>
-          Current Turn: {isPlayerOneTurn ? "Player 1 (🟢)" : "Player 2 (🔵)"}
+          Current Turn: {isPlayerOneTurn ? "Player 1 (🔴)" : "Player 2 (🔵)"}
         </p>
       )}
 

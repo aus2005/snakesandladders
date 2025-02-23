@@ -5,10 +5,9 @@ function App() {
   return (
     <div className="App">
       <h1 className="text-3xl font-bold text-center my-4">
-       Snakes and Ladders
+        Snakes And Ladders
       </h1>
       <Chessboard />
-    
     </div>
   );
 }
